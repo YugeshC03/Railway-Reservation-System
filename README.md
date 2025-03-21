@@ -17,7 +17,7 @@ Clean and intuitive user interface optimized for various devices. ✅ Data Manag
 
 Passenger, train, and booking details stored securely in MongoDB. Admin access control for data management. ✅ Error Handling and Notifications:
 
-Error prompts for invalid actions. Confirmation messages for booking status. 🏗️ Tech Stack Frontend: HTML, CSS, JavaScript. Backend: MongoDB. Tools: Visual Studio Code. 🚀 Getting Started Clone the Repository: bash Copy Edit git clone https://github.com/NixonMK/Railway-Reservation.git cd railway-reservation-system Set Up MongoDB:
+Error prompts for invalid actions. Confirmation messages for booking status. 🏗️ Tech Stack Frontend: HTML, CSS, JavaScript. Backend: MongoDB. Tools: Visual Studio Code. 🚀 Getting Started Clone the Repository: bash Copy Edit git clone https://github.com/YugeshC03/Railway-Reservation-System.git cd railway-reservation-system Set Up MongoDB:
 
 Install MongoDB and ensure it’s running. Create a database named railway_reservation and collections for trains, passengers, and bookings. Run the Application:
 
