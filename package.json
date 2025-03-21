@@ -1,0 +1,9 @@
+{
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "morgan": "^1.10.0"
+  }
+}

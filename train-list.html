@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Available Trains</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      text-align: center;
+      animation: fadeIn 1s ease-in;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      animation: slideUp 1s ease-in-out;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      animation: fadeIn 1s ease-in;
+    }
+
+    th, td {
+      padding: 12px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+
+    th {
+      background-color: #007bff;
+      color: white;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      background-color: #28a745;
+      color: white;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: transform 0.3s, background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #218838;
+      transform: scale(1.05);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+  </style>
+  <div class="container">
+    <h1>Available Trains</h1>
+    <div id="loadingSpinner" class="loading-spinner">
+      <div class="spinner"></div>
+    </div>
+    <div id="emptyState" class="empty-state" style="display: none;">
+      <svg class="empty-train-icon" viewBox="0 0 100 100" fill="none" stroke="#3498db" stroke-width="2">
+        <path d="M10,80 L90,80 M20,80 L20,60 L80,60 L80,80 M30,60 L30,40 L70,40 L70,60 M40,40 L40,30 L60,30 L60,40 M30,80 L35,90 M70,80 L65,90 M40,70 C40,73 37,75 35,75 C33,75 30,73 30,70 C30,67 33,65 35,65 C37,65 40,67 40,70 M70,70 C70,73 67,75 65,75 C63,75 60,73 60,70 C60,67 63,65 65,65 C67,65 70,67 70,70 M15,60 L85,60"></path>
+      </svg>
+      <h3>No trains available</h3>
+      <p>Try adjusting your search criteria</p>
+    </div>
+    <table id="trainsTable" style="display: none;">
+      <thead>
+        <tr>
+          <th>Train Number</th>
+          <th>Train Name</th>
+          <th>From</th>
+          <th>To</th>
+          <th>Journey Date</th>
+          <th>Fare (INR)</th>
+          <th>Seats Available</th>
+          <th>Book Now</th>
+        </tr>
+      </thead>
+      <tbody id="trainList">
+      </tbody>
+    </table><br>
+    <button onclick="location.href='search-trains.html'">Back to Search</button>
+  </div>
+  <div id="toast" class="toast">Train selected for booking!</div>
+  <script>
+    async function loadTrains() {
+      try {
+        console.log("Fetching trains from backend...");
+        document.getElementById("loadingSpinner").style.display = "flex";
+        document.getElementById("trainsTable").style.display = "none";
+        document.getElementById("emptyState").style.display = "none";
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        const response = await fetch("/api/trains");
+        if (response.ok) {
+          const trains = await response.json();
+          console.log("Trains data:", trains);
+          document.getElementById("loadingSpinner").style.display = "none";
+          if (trains.length > 0) {
+            document.getElementById("trainsTable").style.display = "table";
+            trains.forEach((train, index) => addTrainToTable(train, index));
+          } else {
+            document.getElementById("emptyState").style.display = "block";
+          }
+        } else {
+          const error = await response.json();
+          console.error("Failed to fetch trains:", error);
+          document.getElementById("loadingSpinner").style.display = "none";
+          document.getElementById("emptyState").style.display = "block";
+          alert("Failed to fetch trains. Please try again.");
+        }
+      } catch (error) {
+        console.error("An error occurred while fetching trains:", error);
+        document.getElementById("loadingSpinner").style.display = "none";
+        document.getElementById("emptyState").style.display = "block";
+        alert("An error occurred while fetching trains.");
+      }
+    }
+    function addTrainToTable(train, index) {
+      const trainList = document.getElementById("trainList");
+      const row = document.createElement("tr");
+      row.style.setProperty('--i', index + 1);
+      row.innerHTML = `
+        <td>${train.trainNumber}</td>
+        <td>${train.trainName}</td>
+        <td>${train.fromStation}</td>
+        <td>${train.toStation}</td>
+        <td>${new Date(train.journeyDate).toLocaleDateString()}</td>
+        <td>₹${train.fare}</td>
+        <td>${train.availableSeats}</td>
+        <td>
+          <button onclick='bookNow("${train._id}")'>Book Now</button>
+        </td>
+      `;
+      trainList.appendChild(row);
+    }
+    function bookNow(trainId) {
+      localStorage.setItem("selectedTrainId", trainId);
+      const toast = document.getElementById("toast");
+      toast.classList.add("show");
+      event.target.style.animation = "pulse 0.5s";
+      setTimeout(() => {
+        event.target.style.animation = "";
+      }, 500);
+      setTimeout(() => {
+        window.location.href = "book-now.html";
+      }, 800);
+    }
+    document.getElementById("toast").addEventListener("transitionend", function() {
+      if (this.classList.contains("show")) {
+        setTimeout(() => {
+          this.classList.remove("show");
+        }, 2000);
+      }
+    });
+    window.onload = loadTrains;
+  </script>
+</body>
+</html>

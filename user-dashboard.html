@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+</head>
+<body>
+    <style>
+        /* Base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 3rem 1.5rem;
+        }
+
+        /* Header with animation */
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 2.5rem;
+            text-align: center;
+            position: relative;
+            padding-bottom: 0.8rem;
+            animation: fadeInDown 1.2s ease-out;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 3px;
+            background-color: #3498db;
+            animation: expandLine 1.5s ease-out forwards;
+            animation-delay: 0.8s;
+        }
+
+        /* Dashboard container */
+        .dashboard-container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 800px;
+            padding: 2.5rem;
+            animation: fadeIn 1.4s ease-out;
+        }
+
+        h3 {
+            color: #34495e;
+            margin-bottom: 1.8rem;
+            text-align: center;
+            animation: fadeIn 1.6s ease-out;
+        }
+
+        /* Button container */
+        .btn-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            animation: fadeInUp 1.8s ease-out;
+        }
+
+        /* Button styles */
+        button, .btn {
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            background-color: #3498db;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        button:hover, .btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        button:active, .btn:active {
+            transform: translateY(-2px);
+        }
+
+        /* Admin button with different styling */
+        .btn-container button:nth-child(4) {
+            background-color: #e74c3c;
+        }
+
+        .btn-container button:nth-child(4):hover {
+            background-color: #c0392b;
+        }
+
+        /* Back button styling - centered */
+        .back-button-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+            width: 100%;
+            animation: fadeIn 2s ease-out;
+        }
+
+        .back-button {
+            background-color: #95a5a6;
+            max-width: 200px;
+            width: 100%;
+        }
+
+        .back-button:hover {
+            background-color: #7f8c8d;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes expandLine {
+            from { width: 0; }
+            to { width: 120px; }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            .dashboard-container {
+                padding: 1.5rem;
+            }
+
+            .btn-container {
+                grid-template-columns: 1fr;
+            }
+
+            button, .btn {
+                padding: 0.8rem;
+            }
+        }
+    </style>
+    <h2>Welcome to Your Dashboard</h2>
+    <div class="dashboard-container">
+        <h3>User Actions</h3>
+        <div class="btn-container">
+            <button class="btn" onclick="window.location.href='search-trains.html'">Book Ticket</button>
+            <button class="btn" onclick="window.location.href='ticket.html'">View Ticket</button>
+            <button class="btn" onclick="window.location.href='profile.html'">Update Profile</button><br>
+            <button onclick="location.href='adminlogin.html'">Admin Login</button>
+        </div>
+        <div class="back-button-container">
+            <button class="back-button" onclick="location.href='index.html'">Back</button>
+        </div>
+    </div>
+</body>
+</html>

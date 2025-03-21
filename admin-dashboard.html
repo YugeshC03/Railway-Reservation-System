@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+</head>
+<body>
+  <style>
+    /* Base styles and animations */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    
+    .container {
+      background-color: white;
+      border-radius: 15px;
+      padding: 30px;
+      width: 100%;
+      max-width: 700px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      animation: fadeIn 0.8s ease-out;
+    }
+    
+    h1 {
+      text-align: center;
+      color: #3a36db;
+      margin-bottom: 30px;
+      position: relative;
+      animation: slideInDown 0.7s ease-out;
+    }
+    
+    h1::after {
+      content: '';
+      position: absolute;
+      width: 60px;
+      height: 4px;
+      background-color: #3a36db;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-radius: 2px;
+      animation: widthGrow 1s ease-out forwards;
+    }
+    
+    @keyframes widthGrow {
+      from { width: 0; }
+      to { width: 60px; }
+    }
+    
+    form {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      animation: fadeInUp 0.8s ease-out;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #555;
+      transition: all 0.3s ease;
+    }
+    
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+    
+    input:focus {
+      border-color: #3a36db;
+      box-shadow: 0 0 0 3px rgba(58, 54, 219, 0.1);
+      outline: none;
+      transform: translateY(-2px);
+    }
+    
+    .form-group {
+      animation: fadeInLeft 0.5s ease-out;
+      animation-fill-mode: both;
+    }
+    
+    /* Staggered animation for form fields */
+    .form-group:nth-child(1) { animation-delay: 0.1s; }
+    .form-group:nth-child(2) { animation-delay: 0.15s; }
+    .form-group:nth-child(3) { animation-delay: 0.2s; }
+    .form-group:nth-child(4) { animation-delay: 0.25s; }
+    .form-group:nth-child(5) { animation-delay: 0.3s; }
+    .form-group:nth-child(6) { animation-delay: 0.35s; }
+    .form-group:nth-child(7) { animation-delay: 0.4s; }
+    
+    button {
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background-color: #3a36db;
+      color: white;
+      box-shadow: 0 4px 6px rgba(58, 54, 219, 0.1);
+      grid-column: 1 / -1;
+      animation: fadeInUp 0.6s ease-out;
+      animation-delay: 0.5s;
+      animation-fill-mode: both;
+    }
+    
+    button[type="button"] {
+      background-color: #6c757d;
+      margin-top: 10px;
+      animation-delay: 0.6s;
+    }
+    
+    button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 12px rgba(58, 54, 219, 0.15);
+    }
+    
+    button:active {
+      transform: translateY(-1px);
+    }
+    
+    /* Error styles */
+    .error {
+      border-color: #dc3545;
+      animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+    }
+    
+    .error-message {
+      color: #dc3545;
+      font-size: 14px;
+      margin-top: 5px;
+      animation: fadeIn 0.3s;
+    }
+    
+    /* Loading animation */
+    .loading {
+      position: relative;
+      pointer-events: none;
+    }
+    
+    .loading::after {
+      content: "";
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      top: 50%;
+      right: 15px;
+      margin-top: -10px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+    }
+    
+    /* Toast notifications */
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px 25px;
+      border-radius: 8px;
+      color: white;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      transform: translateX(120%);
+      animation: slideInRight 0.5s forwards, slideOutRight 0.5s 3s forwards;
+      z-index: 1000;
+    }
+    
+    .toast-success {
+      background-color: #28a745;
+      border-left: 5px solid #1e7e34;
+    }
+    
+    .toast-error {
+      background-color: #dc3545;
+      border-left: 5px solid #bd2130;
+    }
+    
+    /* Keyframe Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes slideInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes fadeInLeft {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+      20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    @keyframes slideInRight {
+      from { transform: translateX(120%); }
+      to { transform: translateX(0); }
+    }
+    
+    @keyframes slideOutRight {
+      from { transform: translateX(0); }
+      to { transform: translateX(120%); }
+    }
+    
+    /* Responsive styles */
+    @media (max-width: 768px) {
+      form {
+        grid-template-columns: 1fr;
+      }
+      
+      .container {
+        padding: 20px;
+      }
+    }
+  </style>
+  <div class="container">
+    <h1>Add Trains</h1>
+    <form id="addTrainForm">
+      <div class="form-group">
+        <label for="trainNumber">Train Number:</label>
+        <input type="text" id="trainNumber" placeholder="Enter train number">
+      </div>
+      <div class="form-group">
+        <label for="trainName">Train Name:</label>
+        <input type="text" id="trainName" placeholder="Enter train name">
+      </div>
+      <div class="form-group">
+        <label for="fromStation">From Station:</label>
+        <input type="text" id="fromStation" placeholder="Enter departure station">
+      </div>
+      <div class="form-group">
+        <label for="toStation">To Station:</label>
+        <input type="text" id="toStation" placeholder="Enter arrival station">
+      </div>
+      <div class="form-group">
+        <label for="journeyDate">Journey Date:</label>
+        <input type="date" id="journeyDate">
+      </div>
+      <div class="form-group">
+        <label for="availableSeats">Seats Available:</label>
+        <input type="number" id="availableSeats" placeholder="Enter available seats">
+      </div>
+      <div class="form-group">
+        <label for="fare">Fare (₹):</label>
+        <input type="number" id="fare" placeholder="Enter fare amount">
+      </div>
+      <button type="submit" id="submitBtn">Add Train</button>
+      <button type="button" onclick="location.href='index.html'">Back to Home</button>
+    </form>
+  </div>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const form = document.getElementById("addTrainForm");
+      const submitBtn = document.getElementById("submitBtn");
+      const inputs = form.querySelectorAll("input");
+      function showToast(message, type) {
+        const toast = document.createElement("div");
+        toast.className = `toast toast-${type}`;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        setTimeout(() => {
+          if (toast.parentNode) {
+            toast.parentNode.removeChild(toast);
+          }
+        }, 4000);
+      }
+      function validateForm() {
+        let isValid = true;
+        document.querySelectorAll(".error-message").forEach(el => el.remove());
+        inputs.forEach(input => {
+          input.classList.remove("error");
+          if (!input.value.trim()) {
+            isValid = false;
+            input.classList.add("error");
+            const errorMessage = document.createElement("div");
+            errorMessage.className = "error-message";
+            errorMessage.textContent = "This field is required";
+            input.parentNode.appendChild(errorMessage);
+          }
+        });
+        return isValid;
+      }
+      inputs.forEach(input => {
+        input.addEventListener("focus", function() {
+          this.previousElementSibling.style.color = "#3a36db";
+          this.previousElementSibling.style.transform = "translateY(-3px)";
+        });
+        input.addEventListener("blur", function() {
+          this.previousElementSibling.style.color = "#555";
+          this.previousElementSibling.style.transform = "translateY(0)";
+        });
+      });
+      form.addEventListener("submit", async function(event) {
+        event.preventDefault();
+        if (!validateForm()) {
+          showToast("Please fill in all required fields", "error");
+          return;
+        }
+        const trainNumber = document.getElementById("trainNumber").value.trim();
+        const trainName = document.getElementById("trainName").value.trim();
+        const fromStation = document.getElementById("fromStation").value.trim();
+        const toStation = document.getElementById("toStation").value.trim();
+        const journeyDate = document.getElementById("journeyDate").value.trim();
+        const availableSeats = document.getElementById("availableSeats").value.trim();
+        const fare = document.getElementById("fare").value.trim();
+        const trainData = {
+          trainNumber,
+          trainName,
+          fromStation,
+          toStation,
+          journeyDate,
+          availableSeats,
+          fare,
+        };
+        submitBtn.textContent = "Adding Train...";
+        submitBtn.classList.add("loading");
+        submitBtn.disabled = true;
+        try {
+          setTimeout(async () => {
+            try {
+              const response = await fetch("/api/trains/add", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(trainData),
+              });
+              submitBtn.textContent = "Add Train";
+              submitBtn.classList.remove("loading");
+              submitBtn.disabled = false;
+              if (response.ok) {
+                showToast("Train added successfully!", "success");
+                form.reset();
+                document.querySelector(".container").style.animation = "pulse 0.5s";
+                setTimeout(() => {
+                  document.querySelector(".container").style.animation = "";
+                }, 500);
+              } else {
+                const error = await response.json();
+                showToast(error.error || "Failed to add train", "error");
+              }
+            } catch (err) {
+              console.error("Error adding train:", err);
+              showToast("Network error. Please try again", "error");
+              submitBtn.textContent = "Add Train";
+              submitBtn.classList.remove("loading");
+              submitBtn.disabled = false;
+            }
+          }, 1000); 
+        } catch (err) {
+          console.error("Error:", err);
+          showToast("An unexpected error occurred", "error");
+          submitBtn.textContent = "Add Train";
+          submitBtn.classList.remove("loading");
+          submitBtn.disabled = false;
+        }
+      });
+    });
+  </script>
+</body>
+</html>

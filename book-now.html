@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Now</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <style>
+    /* Basic reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+    }
+
+    .container {
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      max-width: 450px;
+      animation: fadeIn 1s ease-in-out, slideUp 0.8s ease-in-out;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+      font-size: 24px;
+      animation: fadeIn 1.5s ease-in-out;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      margin-bottom: 8px;
+      font-weight: bold;
+      color: #555;
+      animation: fadeIn 1.5s ease-in-out;
+    }
+
+    input, select {
+      padding: 12px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      animation: fadeIn 1.5s ease-in-out;
+    }
+
+    input:focus, select:focus {
+      border-color: #6a11cb;
+      box-shadow: 0 0 8px rgba(106, 17, 203, 0.5);
+      outline: none;
+    }
+
+    button {
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      animation: fadeIn 1.5s ease-in-out;
+    }
+
+    button[type="submit"] {
+      background-color: #6a11cb;
+      color: white;
+    }
+
+    button[type="submit"]:hover {
+      background-color: #2575fc;
+      transform: scale(1.05);
+    }
+
+    button[type="button"] {
+      background-color: #555;
+      color: white;
+      margin-top: 10px;
+    }
+
+    button[type="button"]:hover {
+      background-color: #333;
+      transform: scale(1.05);
+    }
+
+    #totalAmount {
+      background-color: #f9f9f9;
+      cursor: not-allowed;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(20px);
+      }
+      to {
+        transform: translateY(0);
+      }
+    }
+
+    /* Hover effects for form elements */
+    input:hover, select:hover {
+      border-color: #6a11cb;
+    }
+
+    /* Background animation */
+    @keyframes gradientBackground {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    body {
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      background-size: 200% 200%;
+      animation: gradientBackground 10s ease infinite;
+    }
+  </style>
+  <div class="container">
+    <h1>Book Your Train Ticket</h1>
+    <form id="bookingForm">
+      <label for="passengerName">Passenger Name:</label>
+      <input type="text" id="passengerName" required><br>
+      <label for="journeyDate">Journey Date:</label>
+      <input type="date" id="journeyDate" required><br>
+      <label for="trainClass">Select Class:</label>
+      <select id="trainClass" required>
+        <option value="1A">First AC (1A)</option>
+        <option value="2A">Second AC (2A)</option>
+        <option value="3A">Third AC (3A)</option>
+        <option value="SL">Sleeper Class (SL)</option>
+      </select><br>
+      <label for="seats">Seats to Book:</label>
+      <input type="number" id="seats" min="1" required><br>
+      <label for="totalAmount">Total Amount (INR):</label>
+      <input type="text" id="totalAmount" readonly><br>
+      <button type="submit">Proceed to Payment</button>
+      <button type="button" onclick="location.href='trains-list.html'">Back</button>
+    </form>
+  </div>
+  <script>
+    const selectedTrainId = localStorage.getItem("selectedTrainId");
+    async function fetchTrainDetails() {
+      try {
+        console.log("Fetching train details for train ID:", selectedTrainId);
+        const response = await fetch(`/api/trains/${selectedTrainId}`);
+        console.log("Response from backend:", response);
+        if (response.ok) {
+          const train = await response.json();
+          console.log("Train details fetched successfully:", train);
+          localStorage.setItem("selectedTrain", JSON.stringify(train));
+          updateFormWithTrainDetails(train);
+        } else {
+          const errorText = await response.text();
+          console.error("Failed to fetch train details. Status:", response.status, "Error:", errorText);
+          alert("Failed to fetch train details. Please try again.");
+        }
+      } catch (error) {
+        console.error("Error fetching train details:", error);
+        alert("An error occurred while fetching train details.");
+      }
+    }
+    function updateFormWithTrainDetails(train) {
+      document.getElementById("seats").addEventListener("input", calculateAmount);
+      calculateAmount();
+    }
+    function calculateAmount() {
+      const train = JSON.parse(localStorage.getItem("selectedTrain"));
+      const seats = parseInt(document.getElementById("seats").value) || 0;
+      console.log("Train object:", train);
+      if (!train.fare) {
+        console.error("Fare not found in train details.");
+        alert("Fare not found. Please try again.");
+        return;
+      }
+      const fare = train.fare;
+      const totalAmount = seats * fare;
+      document.getElementById("totalAmount").value = totalAmount.toFixed(2);
+    }
+    document.getElementById("bookingForm").addEventListener("submit", async function(event) {
+      event.preventDefault();
+      const passengerName = document.getElementById("passengerName").value;
+      const journeyDate = document.getElementById("journeyDate").value;
+      const trainClass = document.getElementById("trainClass").value;
+      const seats = parseInt(document.getElementById("seats").value);
+      const totalAmount = parseFloat(document.getElementById("totalAmount").value);
+      const user = JSON.parse(localStorage.getItem("user"));
+      if (!user || !user._id) {
+        alert("Please log in to book a ticket.");
+        window.location.href = "login.html";
+        return;
+      }
+      if (!passengerName || !journeyDate || !trainClass || !seats || !totalAmount) {
+        alert("Please fill out all fields.");
+        return;
+      }
+      console.log("Booking details:", {
+        userId: user._id,
+        trainId: selectedTrainId,
+        passengerName,
+        seats,
+        journeyDate,
+        trainClass,
+        payment: totalAmount,
+      });
+      try {
+        const response = await fetch("/api/tickets/book", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userId: user._id,
+            trainId: selectedTrainId,
+            passengerName,
+            seats,
+            journeyDate,
+            trainClass,
+            payment: totalAmount,
+          }),
+        });
+        console.log("Response from backend:", response);
+        if (response.ok) {
+          alert("Booking Successful! Redirecting to Payment.");
+          window.location.href = "pay.html";
+        } else {
+          const error = await response.json();
+          console.error("Booking failed. Error:", error);
+          alert(`Booking failed: ${error.error || "Please try again."}`);
+        }
+      } catch (err) {
+        console.error("Error during booking:", err);
+        alert("Booking failed. Please try again.");
+      }
+    });
+    window.onload = fetchTrainDetails;
+  </script>
+</body>
+</htm

@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register</title>
+</head>
+<body>
+  <style>
+    /* Base styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Arial', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+    }
+
+    /* Header animation */
+    h1 {
+      color: #2c3e50;
+      margin-bottom: 2rem;
+      animation: fadeInDown 1s ease-out;
+      position: relative;
+      padding-bottom: 0.5rem;
+    }
+
+    h1::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background-color: #3498db;
+      animation: expandLine 1.5s ease-out forwards;
+      animation-delay: 0.5s;
+    }
+
+    /* Form styling */
+    form {
+      background-color: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+      animation: fadeIn 1s ease-out;
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      margin-bottom: 0.5rem;
+      color: #34495e;
+      font-weight: bold;
+      display: block;
+      animation: fadeIn 1s ease-out;
+    }
+
+    input {
+      padding: 0.8rem;
+      margin-bottom: 1.5rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 1rem;
+      transition: border-color 0.3s, box-shadow 0.3s;
+      animation: slideIn 0.8s ease-out;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #3498db;
+      box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+    }
+
+    button {
+      padding: 0.8rem 1.5rem;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      animation: fadeIn 1.2s ease-out;
+    }
+
+    button:hover {
+      background-color: #2980b9;
+      transform: translateY(-3px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    button:active {
+      transform: translateY(-1px);
+    }
+
+    p {
+      margin-bottom: 1.5rem;
+      color: #7f8c8d;
+      animation: fadeIn 1.3s ease-out;
+    }
+
+    a {
+      color: #3498db;
+      text-decoration: none;
+      font-weight: bold;
+      transition: color 0.3s;
+    }
+
+    a:hover {
+      color: #2980b9;
+      text-decoration: underline;
+    }
+
+    /* Back button styling */
+    body > button {
+      background-color: #95a5a6;
+    }
+
+    body > button:hover {
+      background-color: #7f8c8d;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes expandLine {
+      from { width: 0; }
+      to { width: 100px; }
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 480px) {
+      form {
+        padding: 1.5rem;
+      }
+      
+      input, button {
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+  <h1>Register</h1>
+  <form id="registerForm">
+    <label for="username">Username:</label>
+    <input type="text" id="username" required>
+    <label for="password">Password:</label>
+    <input type="password" id="password" required>
+    <label for="email">Email:</label>
+    <input type="email" id="email" required>
+    <button type="submit">Register</button>
+  </form>
+  <p>Already have an account? <a href="login.html">Login Now</a></p>
+  <button onclick="location.href='login.html'">Back</button>
+  <script>
+    document.getElementById("registerForm").addEventListener("submit", async function(event) {
+    event.preventDefault();
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const email = document.getElementById("email").value.trim();
+      try {
+        const response = await fetch("/api/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password, email }),
+        });
+
+        if (response.ok) {
+          alert("Registered successfully!");
+          window.location.href = "login.html";
+        } else {
+          const error = await response.json();
+          alert(error.error);
+        }
+      } catch (err) {
+        alert("Registration failed. Please try again.");
+      }
+    });
+  </script>
+</body>
+</html>

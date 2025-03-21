@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Ticket</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <style>
+        /* Base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            animation: fadeIn 0.8s ease-in-out;
+        }
+
+        h1 {
+            color: #3a3a3a;
+            text-align: center;
+            margin-bottom: 30px;
+            animation: slideInDown 0.6s ease-out;
+        }
+
+        h2 {
+            color: #4a4a4a;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eaeaea;
+            padding-bottom: 10px;
+            animation: slideInLeft 0.7s ease-out;
+        }
+
+        #ticketDetails {
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        #ticketDetails p {
+            margin-bottom: 12px;
+            line-height: 1.6;
+            padding: 8px;
+            border-bottom: 1px dashed #e0e0e0;
+            animation: fadeIn 1s ease-out;
+            animation-fill-mode: both;
+        }
+
+        #ticketDetails p:nth-child(even) {
+            background-color: #f5f5f5;
+        }
+
+        #ticketDetails p:hover {
+            background-color: #e8f4fd;
+            animation: pulse 0.5s;
+        }
+
+        strong {
+            color: #2c7be5;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+
+        button {
+            background-color: #2c7be5;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-right: 15px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(44, 123, 229, 0.2);
+            animation: fadeInUp 1s ease-out;
+            animation-delay: 0.5s;
+            animation-fill-mode: both;
+        }
+
+        button:last-child {
+            background-color: #34c759;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 10px rgba(44, 123, 229, 0.3);
+            animation: pulse 0.5s;
+        }
+
+        /* Animation keyframes */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+
+        /* Shimmer effect for loading state */
+        .shimmer {
+            background: #f6f7f8;
+            background-image: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%);
+            background-repeat: no-repeat;
+            background-size: 800px 104px;
+            display: block;
+            position: relative;
+            animation: shimmer 1.5s infinite linear;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -468px 0;
+            }
+            100% {
+                background-position: 468px 0;
+            }
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            button {
+                width: 100%;
+                margin-right: 0;
+            }
+        }
+    </style>
+    <div class="container">
+        <h1>Your Ticket</h1>
+        <div id="ticketDetails" class="shimmer">
+        </div>
+        <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
+            <button onclick="location.href='user-dashboard.html'">Back to Dashboard</button>
+            <button onclick="downloadTicket()" id="downloadBtn">Download Ticket (PDF)</button>
+            <button onclick="cancelTicket()" id="cancelBtn">Cancel Ticket</button>
+        </div>
+    </div>
+    <script>
+        let currentTicketId = null;
+        function generateTransactionId() {
+            return 'TXN' + Math.floor(1000000000 + Math.random() * 9000000000);
+        }
+        async function loadTicket() {
+            const user = JSON.parse(localStorage.getItem("user"));
+            if (!user || !user._id) {
+                alert("Please log in to view your ticket.");
+                window.location.href = "login.html";
+                return;
+            }
+            try {
+                console.log("Fetching latest ticket for user:", user._id);
+                const response = await fetch(`/api/tickets/latest/${user._id}`);
+                console.log("Response from backend:", response);
+                if (response.ok) {
+                    const ticket = await response.json();
+                    console.log("Ticket details fetched successfully:", ticket);
+                    document.getElementById("ticketDetails").classList.remove("shimmer");
+                    currentTicketId = ticket._id;
+                    displayTicket(ticket);
+                } else {
+                    const error = await response.json();
+                    console.error("Failed to fetch ticket details. Error:", error);
+                    document.getElementById("ticketDetails").classList.remove("shimmer");
+                    alert(error.error || "Failed to fetch ticket details.");
+                }
+            } catch (err) {
+                console.error("Error fetching ticket details:", err);
+                document.getElementById("ticketDetails").classList.remove("shimmer");
+                alert("An error occurred while fetching ticket details.");
+            }
+        }
+        function displayTicket(ticket) {
+            if (!ticket) {
+                document.getElementById("ticketDetails").innerHTML = `
+                    <p style="text-align: center; padding: 20px;">No ticket found! Book a ticket first.</p>
+                    <button onclick="location.href='book-now.html'" style="display: block; margin: 0 auto;">Book Ticket Now</button>
+                `;
+                return;
+            }
+            if (!ticket.transactionId) {
+                ticket.transactionId = generateTransactionId();
+            }
+            document.getElementById("ticketDetails").innerHTML = '<h2>Ticket Details</h2>';
+            const details = [
+                { label: "Transaction ID", value: ticket.transactionId },
+                { label: "Train Name", value: ticket.trainName },
+                { label: "Train Number", value: ticket.trainNumber },
+                { label: "From", value: ticket.fromStation },
+                { label: "To", value: ticket.toStation },
+                { label: "Journey Date", value: new Date(ticket.journeyDate).toLocaleDateString() },
+                { label: "Passenger Name", value: ticket.passengerName },
+                { label: "Class", value: ticket.trainClass },
+                { label: "Seats Booked", value: ticket.seats },
+                { label: "Payment", value: `₹${ticket.payment}` },
+                { label: "Booking Date & Time", value: new Date(ticket.bookingDate || Date.now()).toLocaleString() }
+            ];
+            details.forEach((detail, index) => {
+                setTimeout(() => {
+                    const p = document.createElement('p');
+                    p.innerHTML = `<strong>${detail.label}:</strong> ${detail.value}`;
+                    p.style.setProperty('--i', index);
+                    document.getElementById("ticketDetails").appendChild(p);
+                }, index * 100);
+            });
+        }
+        function downloadTicket() {
+            const downloadBtn = document.getElementById("downloadBtn");
+            downloadBtn.classList.add("button-click");
+            downloadBtn.innerHTML = "Preparing PDF...";
+            downloadBtn.disabled = true;
+            setTimeout(() => {
+                const { jsPDF } = window.jspdf;
+                let doc = new jsPDF();
+                let ticketDetails = document.getElementById("ticketDetails").innerText;
+                doc.text(ticketDetails, 10, 10);
+                doc.save("ticket.pdf");
+                downloadBtn.innerHTML = `Download Ticket (PDF) <span class="success-checkmark"><span class="checkmark"></span></span>`;
+                downloadBtn.disabled = false;
+                downloadBtn.style.backgroundColor = "#28a745";
+                setTimeout(() => {
+                    downloadBtn.style.backgroundColor = "#34c759";
+                    downloadBtn.innerHTML = "Download Ticket (PDF)";
+                }, 2000);
+            }, 800);
+        }
+        async function cancelTicket() {
+            if (!currentTicketId) {
+                alert("No ticket to cancel.");
+                return;
+            }
+            const cancelBtn = document.getElementById("cancelBtn");
+            cancelBtn.classList.add("button-click");
+            const confirmCancel = confirm("Are you sure you want to cancel this ticket?");
+            if (!confirmCancel) return;
+            cancelBtn.innerHTML = "Cancelling...";
+            cancelBtn.disabled = true;
+            try {
+                const response = await fetch(`/api/tickets/cancel/${currentTicketId}`, {
+                    method: "DELETE",
+                });
+                if (response.ok) {
+                    cancelBtn.innerHTML = "Cancelled!";
+                    setTimeout(() => {
+                        alert("Ticket canceled successfully.");
+                        window.location.href = "user-dashboard.html"; // Redirect to user-dashboard.html
+                    }, 500);
+                } else {
+                    const error = await response.json();
+                    alert(error.error || "Failed to cancel ticket.");
+                    cancelBtn.innerHTML = "Cancel Ticket";
+                    cancelBtn.disabled = false;
+                }
+            } catch (err) {
+                console.error("Error canceling ticket:", err);
+                alert("An error occurred while canceling the ticket.");
+                cancelBtn.innerHTML = "Cancel Ticket";
+                cancelBtn.disabled = false;
+            }
+        }
+        document.querySelectorAll('button').forEach(button => {
+            button.addEventListener('click', function() {
+                this.classList.add('button-click');
+                setTimeout(() => {
+                    this.classList.remove('button-click');
+                }, 500);
+            });
+        });
+        window.onload = loadTicket;
+    </script>
+</body>
+</html>

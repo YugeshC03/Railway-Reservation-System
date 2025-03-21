@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+</head>
+<body>
+    <style>
+        /* Base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: white;
+            width: 100%;
+            max-width: 500px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 25px;
+            animation: slideInDown 0.7s ease-out;
+        }
+
+        .input-container {
+            margin-bottom: 20px;
+            animation: slideInLeft 0.5s ease-out;
+            animation-fill-mode: both;
+        }
+
+        /* Stagger animation for form fields */
+        .input-container:nth-child(1) { animation-delay: 0.1s; }
+        .input-container:nth-child(2) { animation-delay: 0.2s; }
+        .input-container:nth-child(3) { animation-delay: 0.3s; }
+        .input-container:nth-child(4) { animation-delay: 0.4s; }
+        .input-container:nth-child(5) { animation-delay: 0.5s; }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            border-color: #4a90e2;
+            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+            outline: none;
+        }
+
+        input.error {
+            border-color: #e74c3c;
+            animation: shake 0.5s;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 5px;
+            animation: fadeIn 0.3s;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.8s ease-out;
+            animation-delay: 0.6s;
+            animation-fill-mode: both;
+        }
+
+        button:hover {
+            background-color: #357abf;
+            transform: translateY(-3px);
+            box-shadow: 0 4px 10px rgba(74, 144, 226, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:last-child {
+            background-color: #6c757d;
+            margin-top: 15px;
+        }
+
+        button:last-child:hover {
+            background-color: #5a6268;
+        }
+
+        .success-message {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #2ecc71;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            animation: slideInDown 0.5s ease-out, fadeOut 0.5s ease-in 2s forwards;
+        }
+
+        /* Keyframe animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        /* Loading spinner */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive styles */
+        @media (max-width: 576px) {
+            .container {
+                padding: 20px;
+            }
+        }
+    </style>
+    <div class="container">
+        <h2>Profile Update</h2>
+        <form id="profileUpdateForm">
+            <div class="input-container">
+                <label for="email">User Name:</label>
+                <input type="email" id="email" placeholder="Enter your email">
+            </div>
+            <div class="input-container">
+                <label for="firstName">First Name:</label>
+                <input type="text" id="firstName" placeholder="Enter your first name">
+            </div>
+            <div class="input-container">
+                <label for="lastName">Last Name:</label>
+                <input type="text" id="lastName" placeholder="Enter your last name">
+            </div>
+            <div class="input-container">
+                <label for="address">Address:</label>
+                <input type="text" id="address" placeholder="Enter your address">
+            </div>
+            <div class="input-container">
+                <label for="phone">Phone No:</label>
+                <input type="text" id="phone" placeholder="Enter your phone number">
+            </div>
+            <button type="submit" id="updateButton">Update Profile</button> 
+        </form>
+        <button onclick="location.href='user-dashboard.html'">Back</button>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const form = document.getElementById("profileUpdateForm");
+            const updateButton = document.getElementById("updateButton");
+            const inputs = form.querySelectorAll("input");
+            const userData = JSON.parse(localStorage.getItem("userData"));
+            if (userData) {
+                document.getElementById("email").value = userData.email || "";
+                document.getElementById("firstName").value = userData.firstName || "";
+                document.getElementById("lastName").value = userData.lastName || "";
+                document.getElementById("address").value = userData.address || "";
+                document.getElementById("phone").value = userData.phone || "";
+            }
+            function validateForm() {
+                let isValid = true;
+                document.querySelectorAll(".error-message").forEach(el => el.remove());
+                inputs.forEach(input => {
+                    input.classList.remove("error");
+                    if (!input.value.trim()) {
+                        isValid = false;
+                        input.classList.add("error");
+                        const errorMessage = document.createElement("div");
+                        errorMessage.className = "error-message";
+                        errorMessage.textContent = "This field is required";
+                        input.parentNode.appendChild(errorMessage);
+                    }
+                });
+                const email = document.getElementById("email");
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (email.value.trim() && !emailRegex.test(email.value)) {
+                    isValid = false;
+                    email.classList.add("error");
+                    const errorMessage = document.createElement("div");
+                    errorMessage.className = "error-message";
+                    errorMessage.textContent = "Please enter a valid email address";
+                    email.parentNode.appendChild(errorMessage);
+                }
+                const phone = document.getElementById("phone");
+                const phoneRegex = /^\d{10}$/;
+                if (phone.value.trim() && !phoneRegex.test(phone.value)) {
+                    isValid = false;
+                    phone.classList.add("error");
+                    const errorMessage = document.createElement("div");
+                    errorMessage.className = "error-message";
+                    errorMessage.textContent = "Please enter a valid 10-digit phone number";
+                    phone.parentNode.appendChild(errorMessage);
+                }   
+                return isValid;
+            }
+            form.addEventListener("submit", function(event) {
+                event.preventDefault();
+                if (validateForm()) {
+                    updateButton.innerHTML = "Updating Profile <span class='spinner'></span>";
+                    updateButton.disabled = true;
+                    setTimeout(function() {
+                        const userData = {
+                            email: document.getElementById("email").value,
+                            firstName: document.getElementById("firstName").value,
+                            lastName: document.getElementById("lastName").value,
+                            address: document.getElementById("address").value,
+                            phone: document.getElementById("phone").value
+                        }; 
+                        localStorage.setItem("userData", JSON.stringify(userData));
+                        const successMessage = document.createElement("div");
+                        successMessage.className = "success-message";
+                        successMessage.textContent = "Profile updated successfully!";
+                        document.body.appendChild(successMessage);
+                        setTimeout(function() {
+                            location.href = 'user-dashboard.html';
+                        }, 2000);
+                    }, 1000);
+                }
+            });
+            inputs.forEach(input => {
+                input.addEventListener("focus", function() {
+                    this.parentNode.style.transform = "translateY(-5px)";
+                    this.parentNode.style.transition = "transform 0.3s ease";
+                });
+                input.addEventListener("blur", function() {
+                    this.parentNode.style.transform = "translateY(0)";
+                });
+            });
+        });
+    </script>
+</body>
+</html>

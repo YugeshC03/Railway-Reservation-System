@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login</title>
+</head>
+<body>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+      background-size: 600% 600%;
+      animation: gradientBG 15s ease infinite;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    h1 {
+      color: white;
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 2.5rem;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      animation: fadeInDown 1s ease-out;
+    }
+    #loginForm {
+      background-color: rgba(255, 255, 255, 0.9);
+      border-radius: 10px;
+      padding: 30px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2);
+      animation: fadeInUp 1s ease-out;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #333;
+      transform: translateX(0);
+      transition: all 0.3s ease;
+      animation: fadeInLeft 0.6s ease-out;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 20px;
+      border: 2px solid #ddd;
+      border-radius: 5px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      animation: fadeInRight 0.6s ease-out;
+    }
+    input:focus {
+      border-color: #4a90e2;
+      box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+      outline: none;
+      transform: translateY(-3px);
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 5px;
+      background-color: #4a90e2;
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      animation: fadeInUp 0.8s ease-out;
+    }
+    button[type="submit"] {
+      background-color: #4a90e2;
+      animation-delay: 0.2s;
+    }
+    button:last-child {
+      background-color: #6c757d;
+      margin-top: 10px;
+      animation-delay: 0.4s;
+    }
+    button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+    button:active {
+      transform: translateY(-1px);
+    }
+    .shake {
+      animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+    }
+    .loading {
+      position: relative;
+      pointer-events: none;
+    }
+    .loading::after {
+      content: "";
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      top: 50%;
+      right: 10px;
+      margin-top: -10px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+    }
+    .success-message {
+      position: fixed;
+      top: 30px;
+      background-color: #4CAF50;
+      color: white;
+      padding: 15px 20px;
+      border-radius: 5px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      opacity: 0;
+      animation: fadeInDown 0.5s ease-out forwards;
+    }
+    .error-message {
+      position: fixed;
+      top: 30px;
+      background-color: #f44336;
+      color: white;
+      padding: 15px 20px;
+      border-radius: 5px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      opacity: 0;
+      animation: fadeInDown 0.5s ease-out forwards;
+    }
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    @keyframes fadeInLeft {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    @keyframes fadeInRight {
+      from {
+        opacity: 0;
+        transform: translateX(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+      20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    @media (max-width: 500px) {
+      #loginForm {
+        padding: 20px;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+    }
+  </style>
+  <h1>Admin Login</h1>
+  <form id="loginForm">
+    <label for="username">Username:</label>
+    <input type="text" id="username" required>
+    <label for="password">Password:</label>
+    <input type="password" id="password" required>
+    <button type="submit" id="loginButton">Login</button>
+    <button type="button" onclick="location.href='index.html'">Back</button>
+  </form>
+  <script>
+    document.getElementById("loginForm").addEventListener("submit", function(event) {
+      event.preventDefault(); 
+      const validUsername = "admin";
+      const validPassword = "password";
+      const enteredUsername = document.getElementById("username").value;
+      const enteredPassword = document.getElementById("password").value;
+      const loginButton = document.getElementById("loginButton");
+      loginButton.textContent = "Logging in...";
+      loginButton.classList.add("loading");
+      setTimeout(() => {
+        loginButton.textContent = "Login";
+        loginButton.classList.remove("loading");
+        if (enteredUsername === validUsername && enteredPassword === validPassword) {
+          const successMessage = document.createElement("div");
+          successMessage.className = "success-message";
+          successMessage.textContent = "Login Successful!";
+          document.body.appendChild(successMessage);
+          setTimeout(() => {
+            window.location.href = "admin-dashboard.html";
+          }, 1000);
+        } else {
+          const errorMessage = document.createElement("div");
+          errorMessage.className = "error-message";
+          errorMessage.textContent = "Invalid username or password. Try again!";
+          document.body.appendChild(errorMessage);
+          document.getElementById("loginForm").classList.add("shake");
+          setTimeout(() => {
+            if (errorMessage.parentNode) {
+              errorMessage.parentNode.removeChild(errorMessage);
+            }
+            document.getElementById("loginForm").classList.remove("shake");
+          }, 3000);
+        }
+      }, 1500);
+    });
+    const inputs = document.querySelectorAll("input");
+    inputs.forEach(input => {
+      input.addEventListener("focus", function() {
+        this.previousElementSibling.style.transform = "translateX(10px)";
+        this.previousElementSibling.style.color = "#4a90e2";
+      });
+      input.addEventListener("blur", function() {
+        this.previousElementSibling.style.transform = "translateX(0)";
+        this.previousElementSibling.style.color = "#333";
+      });
+    });
+  </script>
+</body>
+</html>
